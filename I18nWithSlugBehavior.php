@@ -59,6 +59,17 @@ class I18nWithSlugBehavior extends Behavior
     $this->addCultureColumnToI18n();
     $this->addSlugColumnToI18n();
     $this->moveI18nColumns();
+
+
+    // tell the parent table that it has a descendant
+    $parentBehavior = new I18nWithSlugChildBehavior();
+    $parentBehavior->setName('i18n_with_slug_child');
+    $parentBehavior->setParameters(array('slug_column' => $this->getParameter('slug_column')));
+    $this->i18nTable->addBehavior($parentBehavior);
+    $parentBehavior->getTableModifier()->modifyTable();
+    $parentBehavior->setTableModified(true);
+
+
   }
 
   protected function addI18nTable()
@@ -173,11 +184,10 @@ class I18nWithSlugBehavior extends Behavior
 
   protected function addSlugColumnToI18n()
   {
-    $slugColumnName = $this->getSlugColumnName();
-    if (!$this->i18nTable->hasColumn($slugColumnName))
+    if (!$this->i18nTable->hasColumn($this->getParameter('slug_column')))
     {
       $this->i18nTable->addColumn(array(
-        'name' => $slugColumnName,
+        'name' => $this->getParameter('slug_column'),
         'type' => 'VARCHAR',
         'size' => 255
       ));
@@ -205,10 +215,6 @@ class I18nWithSlugBehavior extends Behavior
   protected function getCultureColumnName()
   {
     return $this->replaceTokens($this->getParameter('culture_column'));
-  }
-  protected function getSlugColumnName()
-  {
-    return $this->replaceTokens($this->getParameter('slug_column'));
   }
 
   protected function getI18nColumnNamesFromConfig()
@@ -259,9 +265,10 @@ class I18nWithSlugBehavior extends Behavior
   {
     return $this->getI18nTable()->getColumn($this->getCultureColumnName());
   }
+
   public function getSlugColumn()
   {
-    return $this->getI18nTable()->getColumn($this->getSlugColumnName());
+    return $this->getI18nTable()->getColumn($this->getParameter('slug_column'));
   }
 
   public function getI18nColumns()

@@ -222,6 +222,7 @@ class I18nWithSlugBehaviorObjectBuilderModifier
   {
     return $this->behavior->renderTemplate('objectSlugSetter', array(
       'slugColumnName' => $this->behavior->getSlugColumn()->getPhpName(),
+      'objectClassname' => $this->builder->getNewStubObjectBuilder($this->behavior->getTable())->getClassname(),
     ));
   }
 

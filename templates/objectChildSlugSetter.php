@@ -6,5 +6,5 @@
 */
 public function setSlug($slug)
 {
-  return $this->getCurrentTranslation()->set<?php echo $slugColumnName?>($slug);
+  return $this->set<?php echo $slugColumnName?>($slug);
 }

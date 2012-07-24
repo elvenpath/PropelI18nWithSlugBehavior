@@ -7,7 +7,6 @@
 *
 * @return   <?php echo $objectClassname?> the result, formatted by the current formatter
 */
-
 public function findOneBySlug($slug, $culture = '<?php echo $defaultCulture ?>', $con = null)
 {
   return $this

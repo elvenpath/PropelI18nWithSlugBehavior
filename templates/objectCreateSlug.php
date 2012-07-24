@@ -3,7 +3,6 @@
 *
 * @return string The object slug
 */
-
 protected function createSlug($culture = '<?php $defaultCulture ?>')
 {
   $slug = $this->createRawSlug();
@@ -18,7 +17,6 @@ protected function createSlug($culture = '<?php $defaultCulture ?>')
 *
 * @return string
 */
-
 protected function createRawSlug()
 {
   <?php if ($pattern):?>
@@ -36,7 +34,6 @@ protected function createRawSlug()
 * @param     string $separator the separator used by slug
 * @return    string             the slugified text
 */
-
 protected static function cleanupSlugPart($slug, $replacement = '<?php echo $replacement?>')
 {
   // transliterate
@@ -76,7 +73,6 @@ protected static function cleanupSlugPart($slug, $replacement = '<?php echo $rep
 * Make sure the slug is short enough to accomodate the column size
 *
 * @param	string $slug			the slug to check
-*
 * @return string						the truncated slug
 */
 protected static function limitSlugSize($slug, $incrementReservedSpace = 3)
@@ -97,7 +93,6 @@ protected static function limitSlugSize($slug, $incrementReservedSpace = 3)
 * @param	string $separator the separator used by slug
 * @return string						the unique slug
 */
-
 protected function makeSlugUnique($slug, $culture = '<?php echo $defaultCulture ?>', $separator = '<?php echo $separator?>', $increment = 0)
 {
   $slug2 = empty($increment) ? $slug : $slug . $separator . $increment;
