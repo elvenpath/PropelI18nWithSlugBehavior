@@ -1,3 +1,4 @@
+
 /**
 * Filter the query on the slug column
 *
@@ -8,9 +9,9 @@
 */
 public function filterBySlug($slug, $culture = '<?php echo $defaultCulture ?>')
 {
-  return $this
-    ->useI18nQuery($culture, '<?php echo $i18nRelationName?>')
-      ->filterBy('<?php echo $cultureColumn ?>', $culture)
-      ->filterBy('<?php echo $slugColumn?>', $slug)
-    ->endUse();
+  $this->joinI18n($culture, '<?php echo $i18nRelationName?>')
+    ->where('<?php echo $i18nRelationName?>.<?php echo $slugColumn?> = ?', $slug);
+
+  return $this;
 }
+

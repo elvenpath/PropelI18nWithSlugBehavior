@@ -8,11 +8,11 @@
  *
  * @return    <?php echo $queryClass ?> The current query, for fluid interface
  */
-public function joinWithI18n($culture = '<?php echo $defaultCulture ?>', $joinType = Criteria::LEFT_JOIN)
+public function joinWithI18n($culture = null, $relationAlias = '<?php echo $i18nRelationName ?>', $joinType = Criteria::LEFT_JOIN)
 {
-	$this
-		->joinI18n($culture, null, $joinType)
-		->with('<?php echo $i18nRelationName ?>');
-	$this->with['<?php echo $i18nRelationName ?>']->setIsWithOneToMany(false);
+  $this->joinI18n($culture, $relationAlias, $joinType)->with($relationAlias);
+
+	$this->with[$relationAlias]->setIsWithOneToMany(false);
+
 	return $this;
 }

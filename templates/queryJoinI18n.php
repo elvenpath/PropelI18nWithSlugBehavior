@@ -8,10 +8,22 @@
  *
  * @return    <?php echo $queryClass ?> The current query, for fluid interface
  */
-public function joinI18n($culture = '<?php echo $defaultCulture ?>', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+public function joinI18n($culture = null, $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
 {
+  if (is_null($culture))
+  {
+    if (sfContext::hasInstance())
+    {
+      $culture = sfContext::getInstance()->getUser()->getCulture();
+    }
+    else
+    {
+      $culture = '<?php echo $defaultCulture ?>';
+    }
+  }
+
 	$relationName = $relationAlias ? $relationAlias : '<?php echo $i18nRelationName ?>';
-	return $this
-		->join<?php echo $i18nRelationName ?>($relationAlias, $joinType)
+
+	return $this->join<?php echo $i18nRelationName ?>($relationAlias, $joinType)
 		->addJoinCondition($relationName, $relationName . '.<?php echo $cultureColumn ?> = ?', $culture);
 }

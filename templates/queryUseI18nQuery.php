@@ -10,9 +10,12 @@
  *
  * @return    <?php echo $queryClass ?> A secondary query class using the current class as primary query
  */
-public function useI18nQuery($culture = '<?php echo $defaultCulture ?>', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+public function useI18nQuery($culture = null, $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
 {
+  $relationAlias =  $relationAlias ? $relationAlias : '<?php echo $i18nRelationName ?>';
+
 	return $this
 		->joinI18n($culture, $relationAlias, $joinType)
-		->useQuery($relationAlias ? $relationAlias : '<?php echo $i18nRelationName ?>', '<?php echo $namespacedQueryClass ?>');
+		->useQuery($relationAlias, '<?php echo $namespacedQueryClass ?>');
 }
+
