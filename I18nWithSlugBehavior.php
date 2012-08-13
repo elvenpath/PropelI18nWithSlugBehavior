@@ -69,7 +69,7 @@ class I18nWithSlugBehavior extends Behavior
     $parentBehavior->setParameters(array(
       'slug_column' => $this->getParameter('slug_column'),
       'culture_column' => $this->getParameter('culture_column'),
-      'default_culture' => $this->getDefaultCulture
+      'default_culture' => $this->getDefaultCulture()
     ));
     $this->i18nTable->addBehavior($parentBehavior);
     $parentBehavior->getTableModifier()->modifyTable();
