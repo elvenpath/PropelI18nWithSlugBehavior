@@ -10,13 +10,21 @@ class I18nWithSlugBehaviorObjectBuilderModifier
 {
 	protected $behavior, $table, $builder;
 
-	public function __construct(I18nWithSlugBehavior $behavior)
+  /**
+   * @param I18nWithSlugBehavior $behavior
+   */
+  public function __construct(I18nWithSlugBehavior $behavior)
 	{
 		$this->behavior = $behavior;
 		$this->table = $behavior->getTable();
 	}
 
-	public function postDelete($builder)
+  /**
+   * @param $builder
+   *
+   * @return string
+   */
+  public function postDelete($builder)
 	{
 		$this->builder = $builder;
 		if (!$builder->getPlatform()->supportsNativeDeleteTrigger() && !$builder->getBuildProperty('emulateForeignKeyConstraints')) {
@@ -47,7 +55,12 @@ class I18nWithSlugBehaviorObjectBuilderModifier
     ));
   }
 
-	public function objectAttributes($builder)
+  /**
+   * @param $builder
+   *
+   * @return string
+   */
+  public function objectAttributes($builder)
 	{
 		return $this->behavior->renderTemplate('objectAttributes', array(
 			'defaultCulture'   => $this->behavior->getDefaultCulture(),
@@ -55,14 +68,24 @@ class I18nWithSlugBehaviorObjectBuilderModifier
 		));
 	}
 
-	public function objectClearReferences($builder)
+  /**
+   * @param $builder
+   *
+   * @return string
+   */
+  public function objectClearReferences($builder)
 	{
 		return $this->behavior->renderTemplate('objectClearReferences', array(
 			'defaultCulture'   => $this->behavior->getDefaultCulture(),
 		));
 	}
 
-	public function objectMethods($builder)
+  /**
+   * @param $builder
+   *
+   * @return string
+   */
+  public function objectMethods($builder)
 	{
 		$this->builder = $builder;
 		$script = '';
@@ -87,7 +110,10 @@ class I18nWithSlugBehaviorObjectBuilderModifier
     return $script;
 	}
 
-	protected function addSetCulture()
+  /**
+   * @return string
+   */
+  protected function addSetCulture()
 	{
 		return $this->behavior->renderTemplate('objectSetCulture', array(
 			'objectClassname' => $this->builder->getStubObjectBuilder($this->table)->getClassname(),
@@ -95,12 +121,20 @@ class I18nWithSlugBehaviorObjectBuilderModifier
 		));
 	}
 
-	protected function addGetCulture()
+  /**
+   * @return string
+   */
+  protected function addGetCulture()
 	{
 		return $this->behavior->renderTemplate('objectGetCulture');
 	}
 
-	protected function addSetCultureAlias($alias)
+  /**
+   * @param $alias
+   *
+   * @return string
+   */
+  protected function addSetCultureAlias($alias)
 	{
 		return $this->behavior->renderTemplate('objectSetCultureAlias', array(
 			'objectClassname' => $this->builder->getStubObjectBuilder($this->table)->getClassname(),
@@ -109,14 +143,22 @@ class I18nWithSlugBehaviorObjectBuilderModifier
 		));
 	}
 
-	protected function addGetCultureAlias($alias)
+  /**
+   * @param $alias
+   *
+   * @return string
+   */
+  protected function addGetCultureAlias($alias)
 	{
 		return $this->behavior->renderTemplate('objectGetCultureAlias', array(
 			'alias' => ucfirst($alias),
 		));
 	}
 
-	protected function addGetTranslation()
+  /**
+   * @return string
+   */
+  protected function addGetTranslation()
 	{
 		$i18nTable = $this->behavior->getI18nTable();
 		$fk = $this->behavior->getI18nForeignKey();
@@ -130,7 +172,10 @@ class I18nWithSlugBehaviorObjectBuilderModifier
 		));
 	}
 
-	protected function addRemoveTranslation()
+  /**
+   * @return string
+   */
+  protected function addRemoveTranslation()
 	{
 		$i18nTable = $this->behavior->getI18nTable();
 		$fk = $this->behavior->getI18nForeignKey();
@@ -143,16 +188,25 @@ class I18nWithSlugBehaviorObjectBuilderModifier
 		));
 	}
 
-	protected function addGetCurrentTranslation()
+  /**
+   * @return string
+   */
+  protected function addGetCurrentTranslation()
 	{
 		return $this->behavior->renderTemplate('objectGetCurrentTranslation', array(
 			'i18nTablePhpName' => $this->builder->getNewStubObjectBuilder($this->behavior->getI18nTable())->getClassname(),
 		));
 	}
 
-	// FIXME: the connection used by getCurrentTranslation in the generated code
-	// cannot be specified by the user
-	protected function addTranslatedColumnGetter(Column $column)
+  /**
+   * @param Column $column
+   *
+   * @return string
+   */
+
+  // FIXME: the connection used by getCurrentTranslation in the generated code
+  // cannot be specified by the user
+  protected function addTranslatedColumnGetter(Column $column)
 	{
 		$objectBuilder = $this->builder->getNewObjectBuilder($this->behavior->getI18nTable());
 		$comment = '';
@@ -175,9 +229,14 @@ class I18nWithSlugBehaviorObjectBuilderModifier
 		));
 	}
 
-	// FIXME: the connection used by getCurrentTranslation in the generated code
-	// cannot be specified by the user
-	protected function addTranslatedColumnSetter(Column $column)
+  /**
+   * @param Column $column
+   *
+   * @return string
+   */
+  // FIXME: the connection used by getCurrentTranslation in the generated code
+  // cannot be specified by the user
+  protected function addTranslatedColumnSetter(Column $column)
 	{
 		$i18nTablePhpName = $this->builder->getNewStubObjectBuilder($this->behavior->getI18nTable())->getClassname();
 		$tablePhpName = $this->builder->getStubObjectBuilder()->getClassname();
@@ -203,7 +262,11 @@ class I18nWithSlugBehaviorObjectBuilderModifier
 		));
 	}
 
-	public function objectFilter(&$script, $builder)
+  /**
+   * @param $script
+   * @param $builder
+   */
+  public function objectFilter(&$script, $builder)
 	{
 		$i18nTable = $this->behavior->getI18nTable();
 		$i18nTablePhpName = $this->builder->getNewStubObjectBuilder($i18nTable)->getUnprefixedClassname();
@@ -218,6 +281,9 @@ class I18nWithSlugBehaviorObjectBuilderModifier
 		$script = preg_replace($pattern, $replacement, $script);
 	}
 
+  /**
+   * @return string
+   */
   protected function addSlugSetter()
   {
     return $this->behavior->renderTemplate('objectSlugSetter', array(
@@ -226,6 +292,9 @@ class I18nWithSlugBehaviorObjectBuilderModifier
     ));
   }
 
+  /**
+   * @return string
+   */
   protected function addSlugGetter()
   {
     return $this->behavior->renderTemplate('objectSlugGetter', array(
@@ -233,10 +302,14 @@ class I18nWithSlugBehaviorObjectBuilderModifier
     ));
   }
 
+  /**
+   * @return string
+   */
   protected function addCreateSlug()
   {
     $i18nTable = $this->behavior->getI18nTable();
-
+//var_dump($i18nTable->getName());
+//var_dump($i18nTable->hasBehavior('soft_delete'));
     return $this->behavior->renderTemplate('objectCreateSlug', array(
       'replacement' => $this->behavior->getParameter('replacement'),
       'pattern' => $this->behavior->getParameter('slug_pattern'),

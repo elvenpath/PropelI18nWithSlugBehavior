@@ -9,13 +9,21 @@ class I18nWithSlugBehaviorQueryBuilderModifier
 {
 	protected $behavior, $table, $builder;
 
-	public function __construct(I18nWithSlugBehavior $behavior)
+  /**
+   * @param I18nWithSlugBehavior $behavior
+   */
+  public function __construct(I18nWithSlugBehavior $behavior)
 	{
 		$this->behavior = $behavior;
 		$this->table = $behavior->getTable();
 	}
 
-	public function queryMethods($builder)
+  /**
+   * @param $builder
+   *
+   * @return string
+   */
+  public function queryMethods($builder)
 	{
 		$this->builder = $builder;
 
@@ -29,7 +37,10 @@ class I18nWithSlugBehaviorQueryBuilderModifier
 		return $script;
 	}
 
-	protected function addJoinI18n()
+  /**
+   * @return string
+   */
+  protected function addJoinI18n()
 	{
 		$fk = $this->behavior->getI18nForeignKey();
 		return $this->behavior->renderTemplate('queryJoinI18n', array(
@@ -40,7 +51,10 @@ class I18nWithSlugBehaviorQueryBuilderModifier
 		));
 	}
 
-	protected function addJoinWithI18n()
+  /**
+   * @return string
+   */
+  protected function addJoinWithI18n()
 	{
 		$fk = $this->behavior->getI18nForeignKey();
 		return $this->behavior->renderTemplate('queryJoinWithI18n', array(
@@ -50,7 +64,10 @@ class I18nWithSlugBehaviorQueryBuilderModifier
 		));
 	}
 
-	protected function addUseI18nQuery()
+  /**
+   * @return string
+   */
+  protected function addUseI18nQuery()
 	{
 		$i18nTable = $this->behavior->getI18nTable();
 		$fk = $this->behavior->getI18nForeignKey();
@@ -63,6 +80,9 @@ class I18nWithSlugBehaviorQueryBuilderModifier
 		));
 	}
 
+  /**
+   * @return string
+   */
   protected function addFilterBySlug()
   {
     $i18nTable = $this->behavior->getI18nTable();
@@ -75,9 +95,11 @@ class I18nWithSlugBehaviorQueryBuilderModifier
     ));
   }
 
+  /**
+   * @return string
+   */
   protected function addFindOneBySlug()
   {
-    $i18nTable = $this->behavior->getI18nTable();
     return $this->behavior->renderTemplate('queryFindOneBySlug', array(
       'objectClassname' => $this->builder->getStubObjectBuilder($this->table)->getClassname(),
       'defaultCulture'        => $this->behavior->getDefaultCulture(),

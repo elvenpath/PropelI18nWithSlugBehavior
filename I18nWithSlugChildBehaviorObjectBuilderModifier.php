@@ -3,13 +3,21 @@ class I18nWithSlugChildBehaviorObjectBuilderModifier
 {
 	protected $behavior, $table, $builder;
 
-	public function __construct(I18nWithSlugChildBehavior $behavior)
+  /**
+   * @param I18nWithSlugChildBehavior $behavior
+   */
+  public function __construct(I18nWithSlugChildBehavior $behavior)
 	{
 		$this->behavior = $behavior;
 		$this->table = $behavior->getTable();
 	}
 
-	public function objectMethods($builder)
+  /**
+   * @param $builder
+   *
+   * @return string
+   */
+  public function objectMethods($builder)
 	{
 		$this->builder = $builder;
 		$script = '';
@@ -23,6 +31,9 @@ class I18nWithSlugChildBehaviorObjectBuilderModifier
     return $script;
 	}
 
+  /**
+   * @return string
+   */
   protected function addSlugSetter()
   {
     return $this->behavior->renderTemplate('objectChildSlugSetter', array(
@@ -31,6 +42,9 @@ class I18nWithSlugChildBehaviorObjectBuilderModifier
     ));
   }
 
+  /**
+   * @return string
+   */
   protected function addSlugGetter()
   {
     return $this->behavior->renderTemplate('objectChildSlugGetter', array(

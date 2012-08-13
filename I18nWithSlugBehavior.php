@@ -15,19 +15,22 @@ class I18nWithSlugBehavior extends Behavior
 
   // default parameters value
   protected $parameters = array(
-    'i18n_table'      => '%TABLE%_i18n',
-    'i18n_phpname'    => '%PHPNAME%I18n',
-    'i18n_columns'    => '',
+    'i18n_table'       => '%TABLE%_i18n',
+    'i18n_phpname'     => '%PHPNAME%I18n',
+    'i18n_columns'     => '',
     'culture_column'   => 'culture',
     'default_culture'  => null,
     'culture_alias'    => '',
-    'slug_column'     => 'slug',
-    'slug_pattern'    => '',
-    'replace_pattern' => '/\W+/', // Tip: use '/[^\\pL\\d]+/u' instead if you're in PHP5.3
-    'replacement'     => '-',
-    'separator'       => '-',
-    'permanent'       => 'false'
+    'slug_column'      => 'slug',
+    'slug_pattern'     => '',
+    'replace_pattern'  => '/\W+/', // Tip: use '/[^\\pL\\d]+/u' instead if you're in PHP5.3
+    'replacement'      => '-',
+    'separator'        => '-',
+    'permanent'        => 'false',
+    'disabled'         => false
   );
+
+  protected $buildProperties = null;
 
   protected $tableModificationOrder = 70;
 
@@ -60,16 +63,17 @@ class I18nWithSlugBehavior extends Behavior
     $this->addSlugColumnToI18n();
     $this->moveI18nColumns();
 
-
     // tell the parent table that it has a descendant
     $parentBehavior = new I18nWithSlugChildBehavior();
     $parentBehavior->setName('i18n_with_slug_child');
-    $parentBehavior->setParameters(array('slug_column' => $this->getParameter('slug_column')));
+    $parentBehavior->setParameters(array(
+      'slug_column' => $this->getParameter('slug_column'),
+      'culture_column' => $this->getParameter('culture_column'),
+      'default_culture' => $this->getDefaultCulture
+    ));
     $this->i18nTable->addBehavior($parentBehavior);
     $parentBehavior->getTableModifier()->modifyTable();
     $parentBehavior->setTableModified(true);
-
-
   }
 
   protected function addI18nTable()
@@ -198,25 +202,35 @@ class I18nWithSlugBehavior extends Behavior
       $unique->addColumn($this->i18nTable->getColumn($this->getParameter('culture_column')));
       $this->i18nTable->addUnique($unique);
     }
-
-
   }
 
+  /**
+   * @return string
+   */
   protected function getI18nTableName()
   {
     return $this->replaceTokens($this->getParameter('i18n_table'));
   }
 
+  /**
+   * @return string-
+   */
   protected function getI18nTablePhpName()
   {
     return $this->replaceTokens($this->getParameter('i18n_phpname'));
   }
 
+  /**
+   * @return string
+   */
   protected function getCultureColumnName()
   {
     return $this->replaceTokens($this->getParameter('culture_column'));
   }
 
+  /**
+   * @return array
+   */
   protected function getI18nColumnNamesFromConfig()
   {
     $columnNames = explode(',', $this->getParameter('i18n_columns'));
@@ -236,6 +250,9 @@ class I18nWithSlugBehavior extends Behavior
     return $columnNames;
   }
 
+  /**
+   * @return null|string
+   */
   public function getDefaultCulture()
   {
     if (!$defaultCulture = $this->getParameter('default_culture'))
@@ -245,11 +262,19 @@ class I18nWithSlugBehavior extends Behavior
     return $defaultCulture;
   }
 
+  /**
+   * Returns the current table's i18n translation table.
+   *
+   * @return Table
+   */
   public function getI18nTable()
   {
     return $this->i18nTable;
   }
 
+  /**
+   * @return ForeignKey
+   */
   public function getI18nForeignKey()
   {
     foreach ($this->i18nTable->getForeignKeys() as $fk)
@@ -261,16 +286,25 @@ class I18nWithSlugBehavior extends Behavior
     }
   }
 
+  /**
+   * @return Column
+   */
   public function getCultureColumn()
   {
     return $this->getI18nTable()->getColumn($this->getCultureColumnName());
   }
 
+  /**
+   * @return Column
+   */
   public function getSlugColumn()
   {
     return $this->getI18nTable()->getColumn($this->getParameter('slug_column'));
   }
 
+  /**
+   * @return array|Column[]
+   */
   public function getI18nColumns()
   {
     $columns = array();
@@ -300,6 +334,11 @@ class I18nWithSlugBehavior extends Behavior
     return $columns;
   }
 
+  /**
+   * @param $string
+   *
+   * @return string
+   */
   public function replaceTokens($string)
   {
     $table = $this->getTable();
@@ -309,6 +348,9 @@ class I18nWithSlugBehavior extends Behavior
     ));
   }
 
+  /**
+   * @return I18nWithSlugBehaviorObjectBuilderModifier
+   */
   public function getObjectBuilderModifier()
   {
     if (is_null($this->objectBuilderModifier))
@@ -318,6 +360,9 @@ class I18nWithSlugBehavior extends Behavior
     return $this->objectBuilderModifier;
   }
 
+  /**
+   * @return I18nWithSlugBehaviorQueryBuilderModifier
+   */
   public function getQueryBuilderModifier()
   {
     if (is_null($this->queryBuilderModifier))
@@ -327,6 +372,9 @@ class I18nWithSlugBehavior extends Behavior
     return $this->queryBuilderModifier;
   }
 
+  /**
+   * @return I18nWithSlugBehaviorPeerBuilderModifier
+   */
   public function getPeerBuilderModifier()
   {
     if (is_null($this->peerBuilderModifier))
@@ -354,5 +402,56 @@ class I18nWithSlugBehavior extends Behavior
   public function getColumnSetter()
   {
     return 'set' . $this->i18nTable->getColumn($this->getParameter('slug_column'))->getPhpName();
+  }
+
+
+  /**
+   * Returns a build property from propel.ini.
+   *
+   * @param string $name
+   *
+   * @return string
+   */
+  public function getBuildProperty($name)
+  {
+    if (null === $this->buildProperties)
+    {
+      $this->buildProperties = new Properties();
+      $this->buildProperties->load(new PhingFile(sfConfig::get('sf_config_dir') . '/propel.ini'));
+    }
+
+    return $this->buildProperties->getProperty($name);
+  }
+
+  /**
+   * Returns true if the current behavior has been disabled.
+   *
+   * @return boolean
+   */
+  protected function isDisabled()
+  {
+    return isset($this->parameters['disabled']) && 'true' == $this->getParameter('disabled');
+  }
+
+  /**
+   * Returns the column on the current model referenced by the translation model.
+   *
+   * @return Column
+   */
+  public function getLocalColumn()
+  {
+    $columns = $this->getI18nForeignKey()->getForeignColumns();
+    return $this->getTable()->getColumn($columns[0]);
+  }
+
+  /**
+   * Returns the column on the translation table the references the current model.
+   *
+   * @return Column
+   */
+  public function getForeignColumn()
+  {
+    $columns = $this->getI18nForeignKey()->getLocalColumns();
+    return $this->getI18nTable()->getColumn($columns[0]);
   }
 }

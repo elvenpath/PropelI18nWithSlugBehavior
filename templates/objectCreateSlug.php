@@ -96,10 +96,13 @@ protected static function limitSlugSize($slug, $incrementReservedSpace = 3)
 protected function makeSlugUnique($slug, $culture = '<?php echo $defaultCulture ?>', $separator = '<?php echo $separator?>', $increment = 0)
 {
   $slug2 = empty($increment) ? $slug : $slug . $separator . $increment;
-  $slugAlreadyExists = <?php echo $i18nQueryName?>::create()->filterBy<?php echo $cultureColumnName?>($culture)->filterBySlug($slug2)->prune($this)
-  // watch out: some of the columns may be hidden by the soft_delete behavior
-  <?php if ($softDeleteBehaviour)?>->includeDeleted()
-  ->count();
+  $slugAlreadyExists = <?php echo $i18nQueryName?>::create()
+    ->filterBy<?php echo $cultureColumnName?>($culture)
+    ->filterBySlug($slug2)->prune($this)
+    <?php if ($softDeleteBehaviour):?>
+    ->includeDeleted()      // watch out: some of the columns may be hidden by the soft_delete behavior
+    <?php endif ?>
+    ->count();
 
   if ($slugAlreadyExists)
   {
