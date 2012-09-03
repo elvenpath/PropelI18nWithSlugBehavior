@@ -2,7 +2,7 @@
 
 if ($this->isColumnModified(<?php echo $const ?>) && $this-><?php echo $columnGetter?>())
 {
-  $this-><?php echo $columnSetter?>($this->makeSlugUnique($this-><?php echo $columnGetter?>(), '<?php echo $defaultCulture?>'));
+  $this-><?php echo $columnSetter?>($this->makeSlugUnique($this-><?php echo $columnGetter?>(), $this->getCulture()));
 <?php if (permanent == 'true'):?>
 }
 elseif (!$this-><?php echo $columnGetter?>())
@@ -13,6 +13,6 @@ elseif (!$this-><?php echo $columnGetter?>())
 }
 else
 {
-  $this-><?php echo $columnSetter?>($this->createSlug());
+  $this-><?php echo $columnSetter?>($this->createSlug($this->getCulture()));
 }
 <?php endif ?>

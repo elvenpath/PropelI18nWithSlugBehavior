@@ -1,3 +1,4 @@
+
 /**
 * Wrap the getter for slug
 *
@@ -7,3 +8,4 @@ public function getSlug()
 {
   return $this->get<?php echo $slugColumnName?>();
 }
+

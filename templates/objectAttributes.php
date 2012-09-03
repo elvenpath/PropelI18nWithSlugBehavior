@@ -3,7 +3,7 @@
  * Current culture
  * @var        string
  */
-protected $currentCulture = '<?php echo $defaultCulture?>';
+protected $currentCulture = null;
 
 /**
  * Current translation objects

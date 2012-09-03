@@ -6,7 +6,7 @@
  * @param     PropelPDO $con an optional connection object
  * @return    <?php echo $objectClassname ?> The current object (for fluent API support)
  */
-public function removeTranslation($culture = '<?php echo $defaultCulture ?>', PropelPDO $con = null)
+public function removeTranslation($culture, PropelPDO $con = null)
 {
 	if (!$this->isNew()) {
 		<?php echo $i18nQueryName ?>::create()

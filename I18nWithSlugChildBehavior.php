@@ -1,5 +1,6 @@
 <?php
 require_once dirname(__FILE__) . '/I18nWithSlugChildBehaviorObjectBuilderModifier.php';
+require_once dirname(__FILE__) . '/I18nWithSlugChildBehaviorQueryBuilderModifier.php';
 
 class I18nWithSlugChildBehavior extends Behavior
 {
@@ -73,5 +74,26 @@ class I18nWithSlugChildBehavior extends Behavior
   public function getDefaultCulture()
   {
     return $this->getParameter('default_culture');
+  }
+
+
+  /**
+   * Get the getter of the column of the behavior
+   *
+   * @return string The related getter, e.g. 'getSlug'
+   */
+  public function getColumnGetter()
+  {
+    return 'get' . $this->table->getColumn($this->getParameter('slug_column'))->getPhpName();
+  }
+
+  /**
+   * Get the setter of the column of the behavior
+   *
+   * @return string The related setter, e.g. 'setSlug'
+   */
+  public function getColumnSetter()
+  {
+    return 'set' . $this->table->getColumn($this->getParameter('slug_column'))->getPhpName();
   }
 }

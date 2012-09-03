@@ -8,7 +8,7 @@
  *
  * @return    <?php echo $queryClass ?> The current query, for fluid interface
  */
-public function joinI18n($culture = null, $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+public function joinI18n($culture = null, $relationAlias = null, $joinType = Criteria::INNER_JOIN)
 {
   if (is_null($culture))
   {

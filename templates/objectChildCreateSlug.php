@@ -3,11 +3,11 @@
 *
 * @return string The object slug
 */
-protected function createSlug($culture = '<?php $defaultCulture ?>')
+protected function createSlug()
 {
   $slug = $this->createRawSlug();
   $slug = $this->limitSlugSize($slug);
-  $slug = $this->makeSlugUnique($slug, $culture);
+  $slug = $this->makeSlugUnique($slug);
 
   return $slug;
 }
@@ -19,19 +19,21 @@ protected function createSlug($culture = '<?php $defaultCulture ?>')
 */
 protected function createRawSlug()
 {
-  <?php if ($pattern):?>
-  <?php echo "return '" . str_replace(array('{', '}'), array('\' . $this->cleanupSlugPart($this->get', '()) . \''), $pattern). "';";?>
-  <?php else:?>
-    return $this->cleanupSlugPart($this->__toString());
-  <?php endif ?>
+<?php if ($pattern):?>
+<?php echo "return '" . str_replace(array('{', '}'), array('\' . $this->cleanupSlugPart($this->get', '()) . \''), $pattern). "';";?>
+<?php else:?>
+  return $this->cleanupSlugPart($this->__toString());
+<?php endif ?>
+
 }
 
 /**
 * Cleanup a string to make a slug of it
 * Removes special characters, replaces blanks with a separator, and trim it
 *
-* @param     string $text      the text to slugify
-* @param     string $separator the separator used by slug
+* @param        $slug
+* @param string $replacement
+*
 * @return    string             the slugified text
 */
 protected static function cleanupSlugPart($slug, $replacement = '<?php echo $replacement?>')
@@ -56,7 +58,7 @@ protected static function cleanupSlugPart($slug, $replacement = '<?php echo $rep
   $slug = str_replace(array('\'', '`', '^'), '', $slug);
 
   // replace non letter or digits with separator
-  $slug = preg_replace('<?php echo $replace_pattern?>>', $replacement, $slug);
+  $slug = preg_replace('<?php echo $replace_pattern?>', $replacement, $slug);
 
   // trim
   $slug = trim($slug, $replacement);
@@ -72,8 +74,10 @@ protected static function cleanupSlugPart($slug, $replacement = '<?php echo $rep
 /**
 * Make sure the slug is short enough to accomodate the column size
 *
-* @param	string $slug			the slug to check
-* @return string						the truncated slug
+* @param  string $slug      the slug to check
+* @param int     $incrementReservedSpace
+*
+* @return string            the truncated slug
 */
 protected static function limitSlugSize($slug, $incrementReservedSpace = 3)
 {
@@ -89,16 +93,20 @@ protected static function limitSlugSize($slug, $incrementReservedSpace = 3)
 /**
 * Get the slug, ensuring its uniqueness
 *
-* @param	string $slug			the slug to check
-* @param	string $separator the separator used by slug
-* @return string						the unique slug
+* @param  string    $slug      the slug to check
+* @param  string    $separator the separator used by slug
+* @param  int       $increment int
+*
+* @return string            the unique slug
 */
-protected function makeSlugUnique($slug, $culture = '<?php echo $defaultCulture ?>', $separator = '<?php echo $separator?>', $increment = 0)
+protected function makeSlugUnique($slug,  $separator = '<?php echo $separator?>', $increment = 0)
 {
   $slug2 = empty($increment) ? $slug : $slug . $separator . $increment;
   $slugAlreadyExists = <?php echo $i18nQueryName?>::create()
-    ->filterBy<?php echo $cultureColumnName?>($culture)
-    ->filterBySlug($slug2)->prune($this)
+    ->filterBySlug($slug2, $this->get<?php echo $cultureColumnName?>())
+    ->_if(!$this->isNew())
+    ->filterById($this->getId(), Criteria::NOT_EQUAL)
+    ->_endif()
     <?php if ($softDeleteBehaviour):?>
     ->includeDeleted()      // watch out: some of the columns may be hidden by the soft_delete behavior
     <?php endif ?>
@@ -106,10 +114,12 @@ protected function makeSlugUnique($slug, $culture = '<?php echo $defaultCulture 
 
   if ($slugAlreadyExists)
   {
-    return $this->makeSlugUnique($slug, $culture, $separator, ++$increment);
+    return $this->makeSlugUnique($slug, $separator, ++$increment);
   }
   else
   {
     return $slug2;
   }
 }
+
+

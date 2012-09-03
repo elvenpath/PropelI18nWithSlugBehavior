@@ -23,7 +23,7 @@ class I18nWithSlugBehavior extends Behavior
     'culture_alias'    => '',
     'slug_column'      => 'slug',
     'slug_pattern'     => '',
-    'replace_pattern'  => '/\W+/', // Tip: use '/[^\\pL\\d]+/u' instead if you're in PHP5.3
+    'replace_pattern'  => '/[^\\pL\\d]+/u', // Tip: use '/[^\\pL\\d]+/u' instead if you're in PHP5.3
     'replacement'      => '-',
     'separator'        => '-',
     'permanent'        => 'false',
@@ -66,11 +66,24 @@ class I18nWithSlugBehavior extends Behavior
     // tell the parent table that it has a descendant
     $parentBehavior = new I18nWithSlugChildBehavior();
     $parentBehavior->setName('i18n_with_slug_child');
-    $parentBehavior->setParameters(array(
-      'slug_column' => $this->getParameter('slug_column'),
-      'culture_column' => $this->getParameter('culture_column'),
-      'default_culture' => $this->getDefaultCulture()
-    ));
+
+    $parent_columns = array();
+    foreach ($this->getTable()->getColumns() as $column)
+    {
+      /** @var $column Column */
+      if ($column->isForeignKey() or $column->isPrimaryKey())
+      {
+        continue;
+      }
+
+      $parent_columns[] = $column;
+    }
+    $parentBehavior->setParameters(array_merge(
+      $this->getParameters(),
+      array(
+        'caller_class_name' => $this->getTable()->getPhpName(),
+        'parent_columns' => $parent_columns
+      )));
     $this->i18nTable->addBehavior($parentBehavior);
     $parentBehavior->getTableModifier()->modifyTable();
     $parentBehavior->setTableModified(true);

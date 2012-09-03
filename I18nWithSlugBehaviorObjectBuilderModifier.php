@@ -37,25 +37,6 @@ class I18nWithSlugBehaviorObjectBuilderModifier
 	}
 
   /**
-   * Add code in ObjectBuilder::preSave
-   *
-   * @param $builder ObjectBuilder
-   * @return string The code to put at the hook
-   */
-  public function preSave($builder)
-  {
-    $const = $builder->getColumnConstant($this->behavior->getI18nTable()->getColumn($this->behavior->getParameter('slug_column')));
-
-    return $this->behavior->renderTemplate('objectPreSave', array(
-      'defaultCulture'   => $this->behavior->getDefaultCulture(),
-      'const' => $const,
-      'columnGetter' => $this->behavior->getColumnGetter(),
-      'columnSetter' => $this->behavior->getColumnSetter(),
-      'permanent' => $this->behavior->getParameter('permanent')
-    ));
-  }
-
-  /**
    * @param $builder
    *
    * @return string
@@ -63,7 +44,6 @@ class I18nWithSlugBehaviorObjectBuilderModifier
   public function objectAttributes($builder)
 	{
 		return $this->behavior->renderTemplate('objectAttributes', array(
-			'defaultCulture'   => $this->behavior->getDefaultCulture(),
 			'objectClassname' => $builder->getNewStubObjectBuilder($this->behavior->getI18nTable())->getClassname(),
 		));
 	}
@@ -105,7 +85,6 @@ class I18nWithSlugBehaviorObjectBuilderModifier
 
     $script .= $this->addSlugSetter();
     $script .= $this->addSlugGetter();
-    $script .= $this->addCreateSlug();
 
     return $script;
 	}
@@ -117,7 +96,6 @@ class I18nWithSlugBehaviorObjectBuilderModifier
 	{
 		return $this->behavior->renderTemplate('objectSetCulture', array(
 			'objectClassname' => $this->builder->getStubObjectBuilder($this->table)->getClassname(),
-			'defaultCulture'    => $this->behavior->getDefaultCulture(),
 		));
 	}
 
@@ -181,7 +159,6 @@ class I18nWithSlugBehaviorObjectBuilderModifier
 		$fk = $this->behavior->getI18nForeignKey();
 		return $this->behavior->renderTemplate('objectRemoveTranslation', array(
 			'objectClassname' => $this->builder->getStubObjectBuilder($this->table)->getClassname(),
-			'defaultCulture'    => $this->behavior->getDefaultCulture(),
 			'i18nQueryName'    => $this->builder->getNewStubQueryBuilder($i18nTable)->getClassname(),
 			'i18nCollection'   => $this->builder->getRefFKCollVarName($fk),
 			'cultureColumnName' => $this->behavior->getCultureColumn()->getPhpName(),
@@ -300,27 +277,5 @@ class I18nWithSlugBehaviorObjectBuilderModifier
     return $this->behavior->renderTemplate('objectSlugGetter', array(
       'slugColumnName' => $this->behavior->getSlugColumn()->getPhpName(),
     ));
-  }
-
-  /**
-   * @return string
-   */
-  protected function addCreateSlug()
-  {
-    $i18nTable = $this->behavior->getI18nTable();
-//var_dump($i18nTable->getName());
-//var_dump($i18nTable->hasBehavior('soft_delete'));
-    return $this->behavior->renderTemplate('objectCreateSlug', array(
-      'replacement' => $this->behavior->getParameter('replacement'),
-      'pattern' => $this->behavior->getParameter('slug_pattern'),
-      'replace_pattern' => $this->behavior->getParameter('replace_pattern'),
-      'size' => $this->behavior->getI18nTable()->getColumn($this->behavior->getParameter('slug_column'))->getSize(),
-      'separator' => $this->behavior->getParameter('separator'),
-      'i18nQueryName'    => $this->builder->getNewStubQueryBuilder($i18nTable)->getClassname(),
-      'softDeleteBehaviour'    => $i18nTable->hasBehavior('soft_delete'),
-      'cultureColumnName' => $this->behavior->getCultureColumn()->getPhpName(),
-      'defaultCulture'    => $this->behavior->getDefaultCulture(),
-    ));
-
   }
 }

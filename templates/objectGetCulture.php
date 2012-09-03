@@ -6,8 +6,14 @@
  */
 public function getCulture()
 {
-  return $this->currentCulture;
-}
+  if(null == $this->currentCulture)
+  {
+    return sfPropel::getDefaultCulture();
+  }
+  else
+  {
+    return $this->currentCulture;
+  }}
 
 /**
  * alias for @getCulture

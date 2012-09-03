@@ -8,8 +8,20 @@
 *
 * @return   <?php echo $objectClassname?> the result, formatted by the current formatter
 */
-public function findOneBySlug($slug, $culture = '<?php echo $defaultCulture ?>', $con = null)
+public function findOneBySlug($slug, $culture = null, $con = null)
 {
+  if (is_null($culture))
+  {
+    if (sfContext::hasInstance())
+    {
+      $culture = sfContext::getInstance()->getUser()->getCulture();
+    }
+    else
+    {
+      $culture = '<?php echo $defaultCulture?>';
+    }
+  }
+
   $this->joinI18n($culture, '<?php echo $i18nRelationName?>')
     ->where('<?php echo $i18nRelationName?>.<?php echo $slugColumn?> = ?', $slug);
 

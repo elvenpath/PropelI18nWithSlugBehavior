@@ -1,3 +1,4 @@
+
 /**
 * Wrap the setter for slug value
 *
@@ -8,3 +9,4 @@ public function setSlug($slug)
 {
   return $this->set<?php echo $slugColumnName?>($slug);
 }
+
