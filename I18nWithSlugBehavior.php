@@ -16,7 +16,7 @@ class I18nWithSlugBehavior extends Behavior
     const DEFAULT_CULTURE = 'en_EN';
 
     // default parameters value
-    protected $parameters = array(
+    protected $parameters = [
         'i18n_table' => '%TABLE%_i18n',
         'i18n_phpname' => '%PHPNAME%I18n',
         'i18n_columns' => '',
@@ -29,8 +29,8 @@ class I18nWithSlugBehavior extends Behavior
         'replacement' => '-',
         'separator' => '-',
         'permanent' => 'false',
-        'disabled' => false
-    );
+        'disabled' => false,
+    ];
 
     protected $buildProperties = null;
 
@@ -55,14 +55,14 @@ class I18nWithSlugBehavior extends Behavior
         $tables = $this->getDatabase()->getTables();
         foreach ($tables as $table) {
             if ($table->hasBehavior('i18n_with_slug') && !$table->getBehavior('i18n_with_slug')->getParameter(
-                 'default_culture'
-             )
+                    'default_culture'
+                )
             ) {
                 $table->getBehavior('i18n_with_slug')->addParameter(
-                    array(
+                    [
                         'name' => 'default_culture',
-                        'value' => $this->getParameter('default_culture')
-                    )
+                        'value' => $this->getParameter('default_culture'),
+                    ]
                 );
             }
         }
@@ -76,32 +76,6 @@ class I18nWithSlugBehavior extends Behavior
         $this->addCultureColumnToI18n();
         $this->addSlugColumnToI18n();
         $this->moveI18nColumns();
-
-        // tell the parent table that it has a descendant
-        $parentBehavior = new I18nWithSlugChildBehavior();
-        $parentBehavior->setName('i18n_with_slug_child');
-
-        $parent_columns = array();
-        foreach ($this->getTable()->getColumns() as $column) {
-            /** @var $column Column */
-            if ($column->isForeignKey() or $column->isPrimaryKey()) {
-                continue;
-            }
-
-            $parent_columns[] = $column;
-        }
-        $parentBehavior->setParameters(
-            array_merge(
-                $this->getParameters(),
-                array(
-                    'caller_class_name' => $this->getTable()->getPhpName(),
-                    'parent_columns' => $parent_columns
-                )
-            )
-        );
-        $this->i18nTable->addBehavior($parentBehavior);
-        $parentBehavior->getTableModifier()->modifyTable();
-        $parentBehavior->setTableModified(true);
     }
 
 
@@ -112,16 +86,15 @@ class I18nWithSlugBehavior extends Behavior
         $i18nTableName = $this->getI18nTableName();
         if ($database->hasTable($i18nTableName)) {
             $this->i18nTable = $database->getTable($i18nTableName);
-        }
-        else {
+        } else {
             $this->i18nTable = $database->addTable(
-                array(
+                [
                     'name' => $i18nTableName,
                     'phpName' => $this->getI18nTablePhpName(),
                     'package' => $table->getPackage(),
                     'schema' => $table->getSchema(),
                     'namespace' => $table->getNamespace() ? '\\' . $table->getNamespace() : null,
-                )
+                ]
             );
             // every behavior adding a table should re-execute database behaviors
             foreach ($database->getBehaviors() as $behavior) {
@@ -170,17 +143,17 @@ class I18nWithSlugBehavior extends Behavior
         $cultureColumnName = $this->getCultureColumnName();
         if (!$this->i18nTable->hasColumn($cultureColumnName)) {
             $this->i18nTable->addColumn(
-                array(
+                [
                     'name' => $cultureColumnName,
                     'type' => PropelTypes::VARCHAR,
                     'size' => 5,
                     'default' => $this->getDefaultCulture(),
                     'primaryKey' => 'true',
-                )
+                ]
             );
 
             $index = new Index();
-            $index->addColumn(array('name' => $this->getParameter('culture_column')));
+            $index->addColumn(['name' => $this->getParameter('culture_column')]);
             $index->resetColumnSize();
             $this->i18nTable->addIndex($index);
         }
@@ -224,11 +197,11 @@ class I18nWithSlugBehavior extends Behavior
     {
         if (!$this->i18nTable->hasColumn($this->getParameter('slug_column'))) {
             $this->i18nTable->addColumn(
-                array(
+                [
                     'name' => $this->getParameter('slug_column'),
                     'type' => 'VARCHAR',
-                    'size' => 255
-                )
+                    'size' => 255,
+                ]
             );
 
             // add a unique to column
@@ -277,8 +250,7 @@ class I18nWithSlugBehavior extends Behavior
         foreach ($columnNames as $key => $columnName) {
             if ($columnName = trim($columnName)) {
                 $columnNames[$key] = $columnName;
-            }
-            else {
+            } else {
                 unset($columnNames[$key]);
             }
         }
@@ -351,15 +323,14 @@ class I18nWithSlugBehavior extends Behavior
      */
     public function getI18nColumns()
     {
-        $columns = array();
+        $columns = [];
         $i18nTable = $this->getI18nTable();
         if ($columnNames = $this->getI18nColumnNamesFromConfig()) {
             // Strategy 1: use the i18n_columns parameter
             foreach ($columnNames as $columnName) {
                 $columns [] = $i18nTable->getColumn($columnName);
             }
-        }
-        else {
+        } else {
             // strategy 2: use the columns of the i18n table
             // warning: does not work when database behaviors add columns to all tables
             // (such as timestampable behavior)
@@ -387,10 +358,10 @@ class I18nWithSlugBehavior extends Behavior
 
         return strtr(
             $string,
-            array(
+            [
                 '%TABLE%' => $table->getName(),
                 '%PHPNAME%' => $table->getPhpName(),
-            )
+            ]
         );
     }
 

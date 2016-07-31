@@ -29,7 +29,6 @@ class I18nWithSlugChildBehaviorObjectBuilderModifier
     }
 
     $script .= $this->addCreateSlug();
-    $script .= $this->addParentGetters();
 
     return $script;
 	}
@@ -94,15 +93,4 @@ class I18nWithSlugChildBehaviorObjectBuilderModifier
     ));
   }
 
-  /**
-   * @return string
-   */
-  protected function addParentGetters()
-  {
-    return $this->behavior->renderTemplate('objectChildAddParentGetters', array(
-      'columns' => $this->behavior->getParameter('parent_columns'),
-      'callerClassName' => $this->behavior->getParameter('caller_class_name'),
-      'table' => $this->behavior->getTable()
-    ));
-  }
 }
